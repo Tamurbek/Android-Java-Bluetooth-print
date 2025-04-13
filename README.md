@@ -37,7 +37,8 @@ app/
 
 ## 🎨 Natija namunasi (Chop etilgan chek)
 
-![Sample Print](screenshots/sample-receipt.png)
+![image](https://github.com/user-attachments/assets/6ff143fa-932f-4efb-9f0e-4a0bfdf0bf35) ![image](https://github.com/user-attachments/assets/cd1b2db1-21fe-4503-9d3a-cae191ce3c7b) ![image](https://github.com/user-attachments/assets/db4e8198-3b89-4596-8da4-47a7a6ee4db2)
+
 
 > Ushbu kvitansiya XP-P810 printerda chop etilgan real misol hisoblanadi.
 
