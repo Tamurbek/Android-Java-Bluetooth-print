@@ -12,14 +12,10 @@ import java.io.IOException;
 
 public class Utils {
 
+    // 🖼 Har doim 576px gacha kamaytirish
     public static Bitmap resizeBitmap(Bitmap source, int targetWidth) {
         int originalWidth = source.getWidth();
         int originalHeight = source.getHeight();
-
-        if (originalWidth <= targetWidth) {
-            // Eni allaqachon kichik — o‘zgartirmay qaytaramiz
-            return source;
-        }
 
         float aspectRatio = (float) originalHeight / originalWidth;
         int targetHeight = Math.round(targetWidth * aspectRatio);
@@ -27,54 +23,25 @@ public class Utils {
         return Bitmap.createScaledBitmap(source, targetWidth, targetHeight, true);
     }
 
+    // ⚫⚪ Oddiy qora-oqga o‘tkazish (threshold 128)
+    public static Bitmap toMonochrome(Bitmap original) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+        Bitmap bwBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
-    // ✅ Floyd-Steinberg dithering bilan monoxrom bitmapga o‘tkazish
-    public static Bitmap floydSteinbergDither(Bitmap source) {
-        int width = source.getWidth();
-        int height = source.getHeight();
-        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        float[][] gray = new float[height][width];
-
-        // Grayscale convert
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int pixel = source.getPixel(x, y);
-                int r = Color.red(pixel);
-                int g = Color.green(pixel);
-                int b = Color.blue(pixel);
-                gray[y][x] = (r + g + b) / 3f;
+                int pixel = original.getPixel(x, y);
+                int gray = (Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3;
+                int newPixel = gray < 128 ? Color.BLACK : Color.WHITE;
+                bwBitmap.setPixel(x, y, newPixel);
             }
         }
 
-        // Floyd–Steinberg Dithering
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                float oldPixel = gray[y][x];
-                float newPixel = oldPixel < 128 ? 0 : 255;
-                float error = oldPixel - newPixel;
-                gray[y][x] = newPixel;
-
-                if (x + 1 < width) gray[y][x + 1] += error * 7 / 16f;
-                if (x - 1 >= 0 && y + 1 < height) gray[y + 1][x - 1] += error * 3 / 16f;
-                if (y + 1 < height) gray[y + 1][x] += error * 5 / 16f;
-                if (x + 1 < width && y + 1 < height) gray[y + 1][x + 1] += error * 1 / 16f;
-            }
-        }
-
-        // Result bitmapga yozamiz
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int val = (int) gray[y][x];
-                int color = val < 128 ? Color.BLACK : Color.WHITE;
-                result.setPixel(x, y, color);
-            }
-        }
-
-        return result;
+        return bwBitmap;
     }
 
-    // 🖼 Chizilgan pixel rasmni preview qilish (zoom bilan)
+    // 🖼 Dither qilingan rasmni Canvasga zoom bilan chizish (preview uchun)
     public static Bitmap drawDitheredToCanvas(Bitmap dithered, int scale) {
         int width = dithered.getWidth();
         int height = dithered.getHeight();
@@ -93,18 +60,18 @@ public class Utils {
         return canvasBitmap;
     }
 
-    // 🔄 Dither qilingan bitmapni ESC/POS formatga aylantirish (compressed)
+    // 🧾 ESC/POS formatga aylantirish (Compressed Raster Bit Image)
     public static byte[] decodeBitmapCompressed(Bitmap bmp) throws IOException {
         int width = bmp.getWidth();
         int height = bmp.getHeight();
         int bytesPerLine = (width + 7) / 8;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        // ESC * compressed raster mode
+        // ⬇️ ESC * (Raster bit image)
         stream.write(0x1D);
         stream.write(0x76);
         stream.write(0x30);
-        stream.write(0x01); // compressed mode
+        stream.write(0x01); // Mode 0x01: compressed
 
         stream.write(new byte[]{
                 (byte) (bytesPerLine % 256),

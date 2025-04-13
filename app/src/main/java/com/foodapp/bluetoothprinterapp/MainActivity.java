@@ -18,14 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -50,11 +46,31 @@ public class MainActivity extends AppCompatActivity {
         EditText editText = findViewById(R.id.editText);
         Button printButton = findViewById(R.id.printButton);
         Button nextBtn = findViewById(R.id.next);
+        Button next1Btn = findViewById(R.id.next2);
+        Button next2Btn = findViewById(R.id.next3);
 
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, ImagePrint.class);
+                startActivity(intent);
+                finish();  // LocalPas
+            }
+        });
+
+        next1Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PrintChek.class);
+                startActivity(intent);
+                finish();  // LocalPas
+            }
+        });
+
+        next2Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ReceiptPrint.class);
                 startActivity(intent);
                 finish();  // LocalPas
             }

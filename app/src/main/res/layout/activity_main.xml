@@ -32,4 +32,16 @@
         android:layout_height="wrap_content"
         android:text="Rasm chop etish" />
 
+    <Button
+        android:id="@+id/next2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chek chop etish 1" />
+
+    <Button
+        android:id="@+id/next3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chek chop etish 2" />
+
 </LinearLayout>

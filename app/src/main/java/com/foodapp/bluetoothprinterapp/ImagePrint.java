@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -49,6 +50,17 @@ public class ImagePrint extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         Button btnPickImage = findViewById(R.id.selectImageButton);
         Button btnPrint = findViewById(R.id.printImageButton);
+
+        Button backBtn = findViewById(R.id.back);
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(ImagePrint.this,MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -101,10 +113,10 @@ public class ImagePrint extends AppCompatActivity {
                 OutputStream outputStream = bluetoothSocket.getOutputStream();
 
                 Bitmap original = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                Bitmap resized = Utils.resizeBitmap(original, 576); // XP-P810 uchun mos o‘lcham
-                Bitmap bwBitmap = Utils.floydSteinbergDither(resized);
-                byte[] imageData = Utils.decodeBitmapCompressed(bwBitmap);
-                outputStream.write(imageData);
+                Bitmap resized = Utils.resizeBitmap(original, 576); // Har doim printer gorizontiga mos
+                Bitmap bwBitmap = Utils.toMonochrome(resized);      // Oddiy qora-oq konvertatsiya
+                byte[] data = Utils.decodeBitmapCompressed(bwBitmap);
+                outputStream.write(data);
 
                 // 🔽 Matn ham chiqaramiz rasm tagidan
                 outputStream.write("Sizga rahmat!\n\n\n\n\n\n".getBytes("UTF-8"));
