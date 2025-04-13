@@ -86,9 +86,9 @@ app/
 
 ## ✍️ Muallif
 
-- 👨‍💻 Ism: **Timur**
-- 🔗 GitHub: [@timurdev](https://github.com/timurdev)
-- 📧 Email: `youremail@example.com`
+- 👨‍💻 Ism: **Temur Yuldoshev**
+- 🔗 GitHub: [@timurdev](https://github.com/Tamurbek)
+- 📧 Email: `temuryoldoshev10@gmail.com`
 
 ---
 
