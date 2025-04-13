@@ -87,7 +87,7 @@ app/
 ## ✍️ Muallif
 
 - 👨‍💻 Ism: **Temur Yuldoshev**
-- 🔗 GitHub: [@timurdev](https://github.com/Tamurbek)
+- 🔗 GitHub: [@Tamurbek](https://github.com/Tamurbek)
 - 📧 Email: `temuryoldoshev10@gmail.com`
 
 ---
