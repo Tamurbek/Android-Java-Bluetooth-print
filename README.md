@@ -38,9 +38,9 @@ app/
 ## 🎨 Natija namunasi (Chop etilgan chek)
 
 <p align="center">
-  <img src="[screenshots/sample1.png](https://github.com/user-attachments/assets/6ff143fa-932f-4efb-9f0e-4a0bfdf0bf35)" width="250"/>
-  <img src="[screenshots/sample2.png](https://github.com/user-attachments/assets/cd1b2db1-21fe-4503-9d3a-cae191ce3c7b)" width="250"/>
-  <img src="[screenshots/sample3.png](https://github.com/user-attachments/assets/db4e8198-3b89-4596-8da4-47a7a6ee4db2)" width="250"/>
+  <img src="screenshots/sample1.png](https://github.com/user-attachments/assets/6ff143fa-932f-4efb-9f0e-4a0bfdf0bf35)" width="250"/>
+  <img src="screenshots/sample2.png](https://github.com/user-attachments/assets/cd1b2db1-21fe-4503-9d3a-cae191ce3c7b)" width="250"/>
+  <img src="screenshots/sample3.png](https://github.com/user-attachments/assets/db4e8198-3b89-4596-8da4-47a7a6ee4db2)" width="250"/>
 </p>
 
 > Ushbu kvitansiya XP-P810 printerda chop etilgan real misol hisoblanadi.
