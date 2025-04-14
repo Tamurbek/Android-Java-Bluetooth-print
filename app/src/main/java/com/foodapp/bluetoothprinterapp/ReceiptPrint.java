@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -132,6 +133,7 @@ public class ReceiptPrint extends AppCompatActivity {
     }
 
 
+
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private void printToDevice(BluetoothDevice device) {
         try {
@@ -159,7 +161,7 @@ public class ReceiptPrint extends AppCompatActivity {
                 // Har bir bo‘lakni yuborish
                 outputStream.write(chunk.getBytes("UTF-8"));
                 // Printerning javobini kutish (masalan, 100-200ms)
-                Thread.sleep(100);
+                Thread.sleep(1500);
             }
 
             // Kesish komandasini yuborish
@@ -171,79 +173,5 @@ public class ReceiptPrint extends AppCompatActivity {
         }
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    private void printImageToDevice(BluetoothDevice device) {
-        try {
-            BluetoothSocket socket = device.createRfcommSocketToServiceRecord(PRINTER_UUID);
-            socket.connect();
-            OutputStream outputStream = socket.getOutputStream();
-
-            String jsonReceipt = getReceiptJson();
-            if (jsonReceipt == null) {
-                Toast.makeText(this, "❌ JSON topilmadi", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            // Chekni HTML formatida olish
-            String htmlReceipt = ReceiptFormatter.formatToHtml(jsonReceipt);
-
-            // HTML-ni rasmga aylantirish
-            generateBitmapFromHtml(this, htmlReceipt, new BitmapCallback() {
-                @Override
-                public void onBitmapReady(Bitmap bitmap) {
-                    // Rasmni printerga yuborish
-                    try {
-                        // Printerga yuborish uchun bitmapni kerakli formatga aylantirish
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                        byte[] byteArray = byteArrayOutputStream.toByteArray();
-
-                        // Yuborish
-                        outputStream.write(byteArray);
-
-                        // Kesish komandasini yuborish
-                        outputStream.write(new byte[]{0x1D, 0x56, 0x41, 0x10}); // Kesish komandasi
-                        outputStream.close();
-                        socket.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public interface BitmapCallback {
-        void onBitmapReady(Bitmap bitmap);
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    public static void generateBitmapFromHtml(Context context, String html, BitmapCallback callback) {
-        WebView webView = new WebView(context);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setDrawingCacheEnabled(true);
-
-        // Chek eni 384px deb belgilaymiz (ko'pgina printerlar uchun)
-        webView.layout(0, 0, 384, ViewGroup.LayoutParams.WRAP_CONTENT);
-        webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
-
-        webView.setWebViewClient(new WebViewClient() {
-            public void onPageFinished(WebView view, String url) {
-                view.measure(View.MeasureSpec.makeMeasureSpec(384, View.MeasureSpec.EXACTLY),
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
-
-                view.setDrawingCacheEnabled(true);
-                Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                view.draw(canvas);
-
-                callback.onBitmapReady(bitmap);
-            }
-        });
-    }
 
 }

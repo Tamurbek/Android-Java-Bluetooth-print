@@ -1,14 +1,8 @@
 package com.foodapp.bluetoothprinterapp;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Paint;
 
 import com.foodapp.bluetoothprinterapp.model.ReceiptModel;
 import com.google.gson.Gson;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
