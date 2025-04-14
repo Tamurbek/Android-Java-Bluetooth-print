@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BluetoothPrinterApp</string>
+    <string name="desc_print">Chop etish tugmasi</string>
+    <string name="desc_save">Saqlash tugmasi</string>
+    <string name="desc_share">Ulashish tugmasi</string>
+    <string name="desc_home">Asosiy sahifa tugmasi</string>
 </resources>

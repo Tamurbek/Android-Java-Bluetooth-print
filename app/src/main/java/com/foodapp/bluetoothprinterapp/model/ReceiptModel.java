@@ -13,5 +13,6 @@ public class ReceiptModel {
         public String name;
         public float qty; // qty float bo‘lishi mumkin
         public int price;
+        public String unit;
     }
 }

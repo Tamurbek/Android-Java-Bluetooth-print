@@ -1,46 +1,139 @@
 package com.foodapp.bluetoothprinterapp;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+
 import com.foodapp.bluetoothprinterapp.model.ReceiptModel;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Locale;
 
 public class ReceiptFormatter {
-    public static String format(String json) {
+
+
+    public static String format(String json, int maxLength) {
         Gson gson = new Gson();
         ReceiptModel data = gson.fromJson(json, ReceiptModel.class);
 
-        StringBuilder receipt = new StringBuilder();
-        receipt.append("      ").append(data.company).append("\n");
-        receipt.append("      ").append(data.number).append("\n");
-        receipt.append("--------------------------\n");
-        receipt.append("Savdo\n");
-        receipt.append("Foydalanuvchi: ").append(data.user).append("\n");
-        receipt.append("Kun vaqt: ").append(data.datetime).append("\n");
-        receipt.append("--------------------------\n");
-        receipt.append("Mahsulot            Miqdor    Narx    Jami\n");
-        receipt.append("-----------------------------------------\n");
+        StringBuilder receipt = new StringBuilder(maxLength * 2);  // Kattaroq boshlang'ich hajm berish
+
+        // Chek o'lchami (80mm va 58mm uchun maxLength 48 va 40 bo'lishi mumkin)
+        int maxProductNameLength = maxLength - 4;  // Mahsulot nomiga ajratilgan maydon
+
+        // Matnni birlashtirishda bir nechta chaqiruvlarni kamaytirish
+        receipt.append(horizontalLine(maxLength))
+                .append("\n")
+                .append(centerText(data.company, maxLength))
+                .append("\n")
+                .append(centerText("No: " + data.number, maxLength))
+                .append("\n")
+                .append(horizontalLine(maxLength))
+                .append("\n")
+                .append("Savdo\n")
+                .append("Foydalanuvchi: ")
+                .append(data.user)
+                .append("\n")
+                .append("Kun vaqt: ")
+                .append(data.datetime)
+                .append("\n")
+                .append(horizontalLine(maxLength))
+                .append("\n")
+                .append("Mahsulotlar:")
+                .append("\n")
+                .append(horizontalLine(maxLength))
+                .append("\n");
 
         int totalSum = 0;
-        int maxNameLength = 18; // Mahsulot nomining maksimal uzunligi
 
+        // Mahsulotlar uchun izlash jarayonini optimallashtirish
         for (ReceiptModel.Items p : data.items) {
-            String name = p.name.length() > maxNameLength ? p.name.substring(0, maxNameLength) : p.name;
             float qty = p.qty;
-            int total = (int)(qty * p.price);
-
-            // Ustunlarni to‘g‘ri joylashtirish uchun formatni yaxshilash
-            receipt.append(String.format(Locale.getDefault(), "%-18s %-8.1f %-8d %-8d\n",
-                    name, qty, p.price, total));
-
+            int total = (int) (qty * p.price);
             totalSum += total;
+
+            // Mahsulot nomini qisqartirishni optimallashtirish
+            receipt.append(leftAlignText(p.name, maxProductNameLength))
+                    .append("\n");
+
+            // Miqdor x narx va jami
+            String qtyStr = buildQtyStr(p, qty);
+            receipt.append(leftAlignText(qtyStr, maxLength - 10))
+                    .append(String.format("%7d\n", total)); // Osonroq qo'shish
         }
 
-        receipt.append("--------------------------\n");
-        receipt.append("Umumiy:             ").append(totalSum).append(" so'm\n");
-        receipt.append("\n\n");
+        receipt.append(horizontalLine(maxLength))
+                .append("\n")
+                .append(leftAlignText("Umumiy:", maxLength - 10))
+                .append(String.format("%7d\n", totalSum))
+                .append("\n\n");
 
         return receipt.toString();
     }
+
+    private void setFontSize(OutputStream outputStream, boolean isLarge) throws IOException {
+        if (isLarge) {
+            // ESC/POS komandasini yuborish orqali katta o'lchamli shriftda chop qilish
+            outputStream.write(new byte[]{0x1B, 0x21, 0x10}); // Katta shrift
+        } else {
+            // ESC/POS komandasini yuborish orqali oddiy o'lchamli shrift
+            outputStream.write(new byte[]{0x1B, 0x21, 0x00}); // Oddiy shrift
+        }
+    }
+
+    private void setBold(OutputStream outputStream, boolean isBold) throws IOException {
+        if (isBold) {
+            // ESC/POS komandasini yuborish orqali bold shrift
+            outputStream.write(new byte[]{0x1B, 0x45, 0x01});
+        } else {
+            // ESC/POS komandasini yuborish orqali bold shriftni o'chirish
+            outputStream.write(new byte[]{0x1B, 0x45, 0x00});
+        }
+    }
+
+    private void setItalic(OutputStream outputStream, boolean isItalic) throws IOException {
+        if (isItalic) {
+            // ESC/POS komandasini yuborish orqali italik shrift
+            outputStream.write(new byte[]{0x1B, 0x34});
+        } else {
+            // ESC/POS komandasini yuborish orqali italik shriftni o'chirish
+            outputStream.write(new byte[]{0x1B, 0x35});
+        }
+    }
+
+    private static String buildQtyStr(ReceiptModel.Items p, float qty) {
+        String qtyStr;
+        if (p.unit != null && !p.unit.trim().isEmpty()) {
+            qtyStr = String.format(Locale.getDefault(), "%s %s x %d",
+                    (qty == (int) qty ? String.valueOf((int) qty) : String.format("%.2f", qty)),
+                    p.unit, p.price);
+        } else {
+            qtyStr = String.format(Locale.getDefault(), "%s x %d",
+                    (qty == (int) qty ? String.valueOf((int) qty) : String.format("%.2f", qty)),
+                    p.price);
+        }
+        return qtyStr;
+    }
+
+    private static String centerText(String text, int maxLength) {
+        int space = (maxLength - text.length()) / 2;
+        return " ".repeat(space) + text + " ".repeat(space);
+    }
+
+    private static String leftAlignText(String text, int maxLength) {
+        return String.format("%-" + maxLength + "s", text);
+    }
+
+    private static String horizontalLine(int length) {
+        return "-".repeat(length);
+    }
+
+
+
 
     public static String formatToHtml(String json) {
         Gson gson = new Gson();
@@ -65,7 +158,7 @@ public class ReceiptFormatter {
                 .append("Kun vaqt: ").append(data.datetime).append("</div>");
         html.append("<div class='line'></div>");
 
-        html.append("<div><strong>Mahsulotlar:</strong></div>");
+        html.append("<div>Mahsulotlar:</div>");
         int totalSum = 0;
 
         for (ReceiptModel.Items p : data.items) {

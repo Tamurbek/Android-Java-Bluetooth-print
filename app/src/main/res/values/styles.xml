@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="IconButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:padding">8dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:backgroundTint">#1976D2</item> <!-- Ko‘k fon -->
+        <item name="android:textColor">@android:color/white</item>
+        <item name="iconTint">@android:color/white</item>
+        <item name="iconSize">30dp</item>
+        <item name="iconGravity">textTop</item>
+
+    </style>
+</resources>
